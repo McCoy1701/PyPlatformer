@@ -1,4 +1,5 @@
 import pygame
+from particles import PARTICLE_EFFECT
 from tile import Tile
 from settings import *
 from player import *
@@ -10,6 +11,33 @@ class LEVEL:
         self.setupMap(game_Map) #Calls the setupMap method with arg gameMap
         self.worldShift = 0 #Amount to shift to the world
         self.currentX = 0
+        
+        #Dust
+        self.dustSpt = pygame.sprite.GroupSingle()
+        self.playerONGND = False
+    
+    def jumpParticle(self, pos):
+        if self.player.sprite.FR:
+            pos -= pygame.math.Vector2(1, 5)
+        else:
+            pos += pygame.math.Vector2(1, -5)
+        jumpPTCL = PARTICLE_EFFECT(pos, 'jump')
+        self.dustSpt.add(jumpPTCL)
+    
+    def isPlayerOnGND(self):
+        if self.player.sprite.onGND:
+            self.playerONGND = True
+        else:
+            self.playerONGND = False
+    
+    def landingParticle(self):
+        if not self.playerONGND and self.player.sprite.onGND and not self.dustSpt.sprites():
+            if self.player.sprite.FR:
+                offset = pygame.math.Vector2(1, 4)
+            else:
+                offset = pygame.math.Vector2(-1, 4)
+            fallPTCL = PARTICLE_EFFECT(self.player.sprite.rect.midbottom - offset, 'land')
+            self.dustSpt.add(fallPTCL)
     
     def setupMap(self, layout):
         self.tiles = pygame.sprite.Group() #Assings tiles to pygame sprite group
@@ -25,7 +53,7 @@ class LEVEL:
                     tile = Tile(2, (x,y), TILE_SIZE)
                     self.tiles.add(tile)
                 if tile == 'P':
-                    player = PLAYER((x,y), self.displaySurf)
+                    player = PLAYER((x,y), self.displaySurf, self.jumpParticle)
                     self.player.add(player)
 
     def scrollX(self):
@@ -42,7 +70,7 @@ class LEVEL:
             self.worldShift = 0
             player.speed = 2
 
-    def collisions(self):
+    def Hcollisions(self):
         player = self.player.sprite #Local var player assinged to player sprite
         player.rect.x += player.direction.x * player.speed #Moves the player
         for sprite in self.tiles.sprites(): #Gets each tile
@@ -60,7 +88,10 @@ class LEVEL:
             player.onL = False
         if player.onR and (player.rect.right > self.currentX or player.direction.x <= 0):
             player.onR = False
-
+        
+    def Vcollisions(self):
+        player = self.player.sprite #Local var player assinged to player sprite
+        player.rect.x += player.direction.y * player.speed #Moves the player
         player.applyGravity() #Start gravity
         for sprite in self.tiles.sprites(): #Gets each tile
             if sprite.rect.colliderect(player.rect): #Checks if the player has collied with a tile
@@ -79,12 +110,19 @@ class LEVEL:
             player.onCLG = False
 
     def run(self):
-        #level Tiles
+        #Dust
+        self.dustSpt.update(self.worldShift)
+        self.dustSpt.draw(self.displaySurf)
+        
+        #Level Tiles
         self.tiles.update(self.worldShift) #args shiftX returns None
         self.tiles.draw(self.displaySurf) #args Surface returns list
         self.scrollX()#args None returns None
-
-        #player
+        
+        #Player
         self.player.update() #args None returns None
         self.player.draw(self.displaySurf) #args Surface returns list
-        self.collisions() #Start the collisions
+        self.Hcollisions() #Start the collisions
+        self.isPlayerOnGND()
+        self.Vcollisions()
+        self.landingParticle()

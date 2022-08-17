@@ -2,7 +2,7 @@ import pygame
 from support import importFolder
 
 class PLAYER(pygame.sprite.Sprite):
-    def __init__(self, pos, surface):
+    def __init__(self, pos, surface, jmpPTCL):
         super().__init__()
         self.importAssets()
         self.frameIndex = 0
@@ -15,6 +15,7 @@ class PLAYER(pygame.sprite.Sprite):
         self.dustIndex = 0
         self.dustSpeed = 0.15
         self.displaySurface = surface
+        self.jmpPTCL = jmpPTCL
         
         #PLAYER MOVEMENT
         self.direction = pygame.math.Vector2(0,0)
@@ -66,6 +67,21 @@ class PLAYER(pygame.sprite.Sprite):
         elif self.onCLG:
             self.rect = self.image.get_rect(midtop = self.rect.midtop)
 
+    def dustAnimate(self):
+        if self.status == 'run':
+            self.dustIndex += self.dustSpeed
+            if self.dustIndex >= len(self.dustRun):
+                self.dustIndex = 0
+            dustParticles = self.dustRun[int(self.dustIndex)]
+            if self.FR:
+                pos = self.rect.bottomleft - pygame.math.Vector2(8, 8)
+                self.displaySurface.blit(dustParticles, pos)
+            else:
+                pos = self.rect.bottomright - pygame.math.Vector2(-1, 8)
+                flipped = pygame.transform.flip(dustParticles, True, False)
+                self.displaySurface.blit(flipped, pos)
+            
+
     def playerInput(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
@@ -78,6 +94,7 @@ class PLAYER(pygame.sprite.Sprite):
             self.FR = False  
         elif keys[pygame.K_SPACE] and self.onGND:
             self.jump()
+            self.jmpPTCL(self.rect.midbottom)
         else:
             self.direction.x = 0
 
@@ -103,3 +120,4 @@ class PLAYER(pygame.sprite.Sprite):
         self.playerInput()
         self.getStatus()
         self.animate()
+        self.dustAnimate()
