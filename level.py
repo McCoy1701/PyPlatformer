@@ -25,7 +25,7 @@ class LEVEL:
                     tile = Tile(2, (x,y), TILE_SIZE)
                     self.tiles.add(tile)
                 if tile == 'P':
-                    player = PLAYER((x,y))
+                    player = PLAYER((x,y), self.displaySurf)
                     self.player.add(player)
 
     def scrollX(self):

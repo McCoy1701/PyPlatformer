@@ -2,14 +2,20 @@ import pygame
 from support import importFolder
 
 class PLAYER(pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, surface):
         super().__init__()
         self.importAssets()
-        self.importDust
         self.frameIndex = 0
         self.animationSpeed = 0.15
         self.image = self.animations['idle'][self.frameIndex]
         self.rect = self.image.get_rect(topleft = pos)
+        
+        #DUST
+        self.importDust()
+        self.dustIndex = 0
+        self.dustSpeed = 0.15
+        self.displaySurface = surface
+        
         #PLAYER MOVEMENT
         self.direction = pygame.math.Vector2(0,0)
         self.speed = 1
