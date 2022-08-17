@@ -91,7 +91,7 @@ class LEVEL:
         
     def Vcollisions(self):
         player = self.player.sprite #Local var player assinged to player sprite
-        player.rect.x += player.direction.y * player.speed #Moves the player
+        player.rect.x += player.direction.x * player.speed #Moves the player
         player.applyGravity() #Start gravity
         for sprite in self.tiles.sprites(): #Gets each tile
             if sprite.rect.colliderect(player.rect): #Checks if the player has collied with a tile
