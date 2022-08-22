@@ -1,14 +1,16 @@
 import pygame, sys
 from settings import *
-from level import *
+from level import LEVEL
+from gameData import *
 from debug import debug
 
 pygame.init() #Initalize pygame
-Active = True #Sets the main gameLoop active
-clock = pygame.time.Clock() #clock for pygame
 screen = pygame.display.set_mode((SCREEN_HEIGHT, SCREEN_WIDTH)) #Set the size of the main screen
 display = pygame.Surface((ASCREEN_WIDTH, ASCREEN_HEIGHT)) #Set the size of the display screen
-level = LEVEL(gameMap, display) #Instance LEVEL
+clock = pygame.time.Clock() #clock for pygame
+Active = True #Sets the main gameLoop active
+level = LEVEL(level0, display)
+
 pygame.display.set_caption('PyPlatformer') #Set the caption of the window
 
 while Active: #Main GameLoop
@@ -18,8 +20,8 @@ while Active: #Main GameLoop
         if event.type == pygame.QUIT: #Quit if the event.type is pygame.QUIT
             pygame.quit() #quit
             sys.exit() #exit
-
-    level.run() #Starts executing code in the run method of LEVEL
+    
+    level.run()
 
     surf = pygame.transform.scale(display, (SCREEN_HEIGHT, SCREEN_WIDTH)) #local var surf scales display to SCREEN_WIDTH/HEIGHT in setting
     screen.blit(surf, (0, 0)) #block bit transfer local var surf to screen
