@@ -1,123 +1,123 @@
-import pygame
-from support import importFolder
+import pygame 
+from support import IMPORT_FOLDER
 
 class PLAYER(pygame.sprite.Sprite):
-    def __init__(self, pos, surface, jmpPTCL):
-        super().__init__()
-        self.importAssets()
-        self.frameIndex = 0
-        self.animationSpeed = 0.15
-        self.image = self.animations['idle'][self.frameIndex]
-        self.rect = self.image.get_rect(topleft = pos)
-        
-        #DUST
-        self.importDust()
-        self.dustIndex = 0
-        self.dustSpeed = 0.15
-        self.displaySurface = surface
-        self.jmpPTCL = jmpPTCL
-        
-        #PLAYER MOVEMENT
-        self.direction = pygame.math.Vector2(0,0)
-        self.speed = 0.1
-        self.gravity = 0.8
-        self.jumpSpeed = -10
+	def __init__(self, pos, surface, createJmpPTCL):
+		super().__init__()
+		self.importAssets()
+		self.frameIndex = 0
+		self.animationSpeed = 0.15
+		self.image = self.animations['idle'][self.frameIndex]
+		self.rect = self.image.get_rect(topleft = pos)
 
-        self.status = 'idle'
-        self.FR = True #Facing Right
-        self.onGND = False #on Ground
-        self.onCLG = False #on Ceiling
-        self.onL = False #on Left
-        self.onR = False #on Right
+		self.importDustParticles()
+		self.dustFrame = 0
+		self.dustSpeed = 0.15
+		self.displaySurf = surface
+		self.createJmpPTCL = createJmpPTCL
 
-    def importAssets(self):
-        characterPath = 'assets/' #Local var assinged to the assets folder
-        self.animations = {'idle': [], 'run': [], 'jump':[], 'fall':[]} #dictionary of animations
+		self.direction = pygame.math.Vector2(0,0)
+		self.speed = 1
+		self.gravity = 0.8
+		self.jumpSpeed = -8
 
-        for animation in self.animations.keys(): #Gets each key in the animations dictionary
-            fullPath = characterPath + animation #Assings local var to assets animation path
-            self.animations[animation] = importFolder(fullPath) #Assings the animations key to the images in the folder
+		self.status = 'idle'
+		self.FR = True
+		self.onGND = False
+		self.onCLG = False
+		self.onL = False
+		self.onR = False
 
-    def importDust(self):
-        self.dustRun = importFolder('assets/dust_particles/run')
+	def importAssets(self):
+		characterPath = 'assets/'
+		self.animations = {'idle':[],'run':[],'jump':[],'fall':[]}
 
-    def animate(self):
-        animation = self.animations[self.status] #Get the animation
-        self.frameIndex += self.animationSpeed #increase the frameIndex with animationSpeed
-        if self.frameIndex >= len(animation): self.frameIndex = 0 # if the frameIndex is greater than or equal to the length of the animation set frameIndex to 0
+		for animation in self.animations.keys():
+			fullPath = characterPath + animation
+			self.animations[animation] = IMPORT_FOLDER(fullPath)
 
-        img = animation[int(self.frameIndex)] #Assign img to animation with the frameIndex as the key
-        if self.FR: #If Facing Right
-            self.image = img #Assign self.image to current frame
-        else: #If not Facing Right(facing left)
-            flipped = pygame.transform.flip(img, True, False) #Flip image
-            self.image = flipped #Assign image to the new flipped image
+	def importDustParticles(self):
+		self.dustRun = IMPORT_FOLDER('assets/dust_particles/run')
 
-        if self.onGND and self.onR: 
-            self.rect = self.image.get_rect(bottomright = self.rect.bottomright)
-        elif self.onGND and self.onL:
-            self.rect = self.image.get_rect(bottomleft = self.rect.bottomleft)
-        elif self.onGND:
-            self.rect = self.image.get_rect(midbottom = self.rect.midbottom)
+	def animate(self):
+		animation = self.animations[self.status]
 
-        elif self.onCLG and self.onR:
-            self.rect = self.image.get_rect(topright = self.rect.topright)
-        elif self.onCLG and self.onL:
-            self.rect = self.image.get_rect(topleft = self.rect.topleft)
-        elif self.onCLG:
-            self.rect = self.image.get_rect(midtop = self.rect.midtop)
+		self.frameIndex += self.animationSpeed
+		if self.frameIndex >= len(animation):
+			self.frameIndex = 0
 
-    def dustAnimate(self):
-        if self.status == 'run':
-            self.dustIndex += self.dustSpeed
-            if self.dustIndex >= len(self.dustRun):
-                self.dustIndex = 0
-            dustParticles = self.dustRun[int(self.dustIndex)]
-            if self.FR:
-                pos = self.rect.bottomleft - pygame.math.Vector2(8, 8)
-                self.displaySurface.blit(dustParticles, pos)
-            else:
-                pos = self.rect.bottomright - pygame.math.Vector2(-1, 8)
-                flipped = pygame.transform.flip(dustParticles, True, False)
-                self.displaySurface.blit(flipped, pos)
-            
+		image = animation[int(self.frameIndex)]
+		if self.FR:
+			self.image = image
+		else:
+			flipped = pygame.transform.flip(image,True,False)
+			self.image = flipped
 
-    def playerInput(self):
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-            self.direction.x = 2
-            self.Right = True
-            self.FR = True
-        elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
-            self.direction.x = -2
-            self.Right = False
-            self.FR = False  
-        elif keys[pygame.K_SPACE] and self.onGND:
-            self.jump()
-            self.jmpPTCL(self.rect.midbottom)
-        else:
-            self.direction.x = 0
+		if self.onGND and self.onR:
+			self.rect = self.image.get_rect(bottomright = self.rect.bottomright)
+		elif self.onGND and self.onL:
+			self.rect = self.image.get_rect(bottomleft = self.rect.bottomleft)
+		elif self.onGND:
+			self.rect = self.image.get_rect(midbottom = self.rect.midbottom)
+		elif self.onCLG and self.onR:
+			self.rect = self.image.get_rect(topright = self.rect.topright)
+		elif self.onCLG and self.onL:
+			self.rect = self.image.get_rect(topleft = self.rect.topleft)
+		elif self.onCLG:
+			self.rect = self.image.get_rect(midtop = self.rect.midtop)
 
-    def getStatus(self):
-        if self.direction.y < 0:
-            self.status = 'jump'
-        elif self.direction.y > 1:
-            self.status = 'fall'
-        else:
-            if self.direction.x != 0:
-                self.status = 'run'
-            else:
-                self.status = 'idle'
+	def runDustAnimation(self):
+		if self.status == 'run' and self.onGND:
+			self.dustFrame += self.dustSpeed
+			if self.dustFrame >= len(self.dustRun):
+				self.dustFrame = 0
 
-    def applyGravity(self):
-        self.direction.y += self.gravity
-        self.rect.y += self.direction.y
+			dustParticle = self.dustRun[int(self.dustFrame)]
 
-    def jump(self):
-        self.direction.y = self.jumpSpeed
+			if self.FR:
+				pos = self.rect.bottomleft - pygame.math.Vector2(6,10)
+				self.displaySurf.blit(dustParticle, pos)
+			else:
+				pos = self.rect.bottomright - pygame.math.Vector2(6,10)
+				flippedDust = pygame.transform.flip(dustParticle,True,False)
+				self.displaySurf.blit(flippedDust, pos)
 
-    def update(self):
-        self.playerInput()
-        self.getStatus()
-        self.animate()
-        self.dustAnimate()
+	def getInput(self):
+		keys = pygame.key.get_pressed()
+
+		if keys[pygame.K_RIGHT] or keys[pygame.K_a]:
+			self.direction.x = -2
+			self.FR = False
+		elif keys[pygame.K_LEFT] or keys[pygame.K_d]:
+			self.direction.x = 2
+			self.FR = True
+		else:
+			self.direction.x = 0
+
+		if keys[pygame.K_SPACE] and self.onGND:
+			self.jump()
+			self.createJmpPTCL(self.rect.midbottom)
+
+	def getStatus(self):
+		if self.direction.y < 0:
+			self.status = 'jump'
+		elif self.direction.y > 1:
+			self.status = 'fall'
+		else:
+			if self.direction.x != 0:
+				self.status = 'run'
+			else:
+				self.status = 'idle'
+
+	def applyGravity(self):
+		self.direction.y += self.gravity
+		self.rect.y += self.direction.y
+
+	def jump(self):
+		self.direction.y = self.jumpSpeed
+
+	def update(self):
+		self.getInput()
+		self.getStatus()
+		self.animate()
+		self.runDustAnimation()

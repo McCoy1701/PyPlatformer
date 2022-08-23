@@ -1,5 +1,5 @@
 import pygame
-from support import importFolder
+from support import IMPORT_FOLDER
 
 class PARTICLE_EFFECT(pygame.sprite.Sprite):
     def __init__(self, pos, type):
@@ -7,9 +7,9 @@ class PARTICLE_EFFECT(pygame.sprite.Sprite):
         self.frameIndex = 0
         self.animationSpeed = 0.5
         if type == 'jump':
-            self.frames = importFolder('assets/dust_particles/jump')
+            self.frames = IMPORT_FOLDER('assets/dust_particles/jump')
         if type == 'land':
-            self.frames = importFolder('assets/dust_particles/land')
+            self.frames = IMPORT_FOLDER('assets/dust_particles/land')
         self.image = self.frames[self.frameIndex]
         self.rect = self.image.get_rect(center = pos)
     
