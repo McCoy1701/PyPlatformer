@@ -11,7 +11,7 @@ class LEVEL:
     def __init__(self, levelData, surf):
         
         self.worldShift = 0
-        self.displaySurf = surf #Assings displaySurf to passed arg surf
+        self.displaySurf = surf
         self.currentX = None
         
         playerLayout = IMPORT_CSV(levelData['player'])
@@ -114,7 +114,7 @@ class LEVEL:
         if self.player.sprite.FR:
             pos -= pygame.math.Vector2(0, 4)
         else:
-            pos += pygame.math.Vector2(0, 4)
+            pos += pygame.math.Vector2(0, 0)
         jumpParticleSprite = PARTICLE_EFFECT(pos,'jump')
         self.dustSprite.add(jumpParticleSprite)
     

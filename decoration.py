@@ -27,33 +27,40 @@ class SKY:
 
 class WATER:
     def __init__(self, top, lvlWidth):
-        waterStart = -SCREEN_WIDTH
-        waterTileW = 24
-        tileAmount = int((lvlWidth + SCREEN_WIDTH * 2) / waterTileW)
+        self.waterStart = -SCREEN_WIDTH
+        self.waterTileW = 24
+        self.top = top
+        self.tileAmount = int((lvlWidth + SCREEN_WIDTH * 2) / self.waterTileW)
+        self.generateWaterTiles()
+
+    def generateWaterTiles(self):
         self.waterSprites = pygame.sprite.Group()
-        for tile in range(tileAmount):
-            x = tile * waterTileW + waterStart
-            y = top
-            sprite = ANIMATED_TILE(waterTileW, x, y, 'assets/world/water')
+        for tile in range(self.tileAmount):
+            x = tile * self.waterTileW + self.waterStart
+            y = self.top
+            sprite = ANIMATED_TILE(self.waterTileW, x, y, 'assets/world/water')
             self.waterSprites.add(sprite)
-    
+
     def draw(self, surf, shift):
         self.waterSprites.update(shift)
         self.waterSprites.draw(surf)
 
 class CLOUD:
     def __init__(self, horizon, lvlWidth, cloudNum):
-        cloudSurf = IMPORT_FOLDER('assets/world/clouds')
-        minX = -SCREEN_WIDTH
-        maxX = lvlWidth + SCREEN_WIDTH
-        minY = 0
-        maxY = horizon
+        self.cloudSurf = IMPORT_FOLDER('assets/world/clouds')
+        self.minX = -SCREEN_WIDTH
+        self.maxX = lvlWidth + SCREEN_WIDTH
+        self.cloudNum = cloudNum
+        self.minY = 0
+        self.maxY = horizon
+        self.generateClouds()
+
+    def generateClouds(self):
         self.cloudSprites = pygame.sprite.Group()
-        
-        for cloud in range(cloudNum):
-            cloud = choice(cloudSurf)
-            x = randint(minX, maxX)
-            y = randint(minY, maxY)
+        for cloud in range(self.cloudNum):
+            cloud = choice(self.cloudSurf)
+            x = randint(self.minX, self.maxX)
+            y = randint(self.minY, self.maxY)
             sprite = STATIC_TILE(0, x, y, cloud)
             self.cloudSprites.add(sprite)
     
