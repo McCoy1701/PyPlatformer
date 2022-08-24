@@ -48,7 +48,7 @@ class PLAYER(pygame.sprite.Sprite):
         
         self.flipImage(animation)
         self.setTheRect()
-    
+
     def flipImage(self, animation):
         image = animation[int(self.frameIndex)]
         if self.FR:
@@ -70,7 +70,7 @@ class PLAYER(pygame.sprite.Sprite):
             self.rect = self.image.get_rect(topleft = self.rect.topleft)
         elif self.onCLG:
             self.rect = self.image.get_rect(midtop = self.rect.midtop)
-    
+
     def runDustAnimation(self):
         if self.status == 'run' and self.onGND:
             self.dustFrame += self.dustSpeed

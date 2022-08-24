@@ -9,7 +9,6 @@ from settings import *
 
 class LEVEL:
     def __init__(self, levelData, surf):
-        
         self.worldShift = 0
         self.displaySurf = surf
         self.currentX = None
@@ -22,34 +21,22 @@ class LEVEL:
         self.dustSprite = pygame.sprite.GroupSingle()
         self.playerOnGround = False
 
-        terrainLayout = IMPORT_CSV(levelData['terrain'])
-        self.terrainSprites = self.createTileGroup(terrainLayout, 'terrain')
+        self.makeSprites(levelData)
 
-        grassLayout = IMPORT_CSV(levelData['grass'])
-        self.grassSprites = self.createTileGroup(grassLayout, 'grass')
-
-        crateLayout = IMPORT_CSV(levelData['crates'])
-        self.crateSprites = self.createTileGroup(crateLayout, 'crates')
-
-        coinLayout = IMPORT_CSV(levelData['coins'])
-        self.coinSprites = self.createTileGroup(coinLayout, 'coins')
-
-        FGTreeLayout = IMPORT_CSV(levelData['FGTrees'])
-        self.FGTreeSprites = self.createTileGroup(FGTreeLayout, 'FGTrees')
-        
-        BGTreeLayout = IMPORT_CSV(levelData['BGTrees'])
-        self.BGTreeSprites = self.createTileGroup(BGTreeLayout, 'BGTrees')
-        
-        enemyLayout = IMPORT_CSV(levelData['enemies'])
-        self.enemySprites = self.createTileGroup(enemyLayout, 'enemies')
-        
-        constraintsLayout = IMPORT_CSV(levelData['constraints'])
-        self.constraintsSprites = self.createTileGroup(constraintsLayout, 'constraints')
-        
         self.sky = SKY(13)
-        lvlWidth = len(terrainLayout[0]) * TILE_SIZE
+        lvlWidth = len(IMPORT_CSV(levelData['terrain'])[0]) * TILE_SIZE
         self.water = WATER(ASCREEN_HEIGHT - 8,  lvlWidth)
         self.clouds = CLOUD(100, lvlWidth, 40)
+
+    def makeSprites(self, levelData):
+        self.terrainSprites = self.createTileGroup(IMPORT_CSV(levelData['terrain']), 'terrain')
+        self.grassSprites = self.createTileGroup(IMPORT_CSV(levelData['grass']), 'grass')
+        self.crateSprites = self.createTileGroup(IMPORT_CSV(levelData['crates']), 'crates')
+        self.coinSprites = self.createTileGroup(IMPORT_CSV(levelData['coins']), 'coins')
+        self.FGTreeSprites = self.createTileGroup(IMPORT_CSV(levelData['FGTrees']), 'FGTrees')
+        self.BGTreeSprites = self.createTileGroup(IMPORT_CSV(levelData['BGTrees']), 'BGTrees')
+        self.enemySprites = self.createTileGroup(IMPORT_CSV(levelData['enemies']), 'enemies')
+        self.constraintsSprites = self.createTileGroup(IMPORT_CSV(levelData['constraints']), 'constraints')
 
     def createTileGroup(self, layout, type):
         spriteGroup = pygame.sprite.Group()
@@ -101,12 +88,12 @@ class LEVEL:
                     goalSurf = pygame.image.load('assets/world/goal.png').convert_alpha()
                     sprite = STATIC_TILE(TILE_SIZE, x, y, goalSurf)
                     self.goal.add(sprite)
-                    
+
     def enemyCollisionReverse(self):
         for enemy in self.enemySprites.sprites():
             if pygame.sprite.spritecollide(enemy, self.constraintsSprites, False):
                 enemy.reverse()
-    
+
     def createJmpPTCL(self, pos):
         if self.player.sprite.FR:
             pos -= pygame.math.Vector2(0, 4)
@@ -114,7 +101,7 @@ class LEVEL:
             pos += pygame.math.Vector2(0, 0)
         jumpParticleSprite = PARTICLE_EFFECT(pos,'jump')
         self.dustSprite.add(jumpParticleSprite)
-    
+
     def getPlayerOnGround(self):
         if self.player.sprite.onGND:
             self.playerOnGround = True
@@ -129,36 +116,26 @@ class LEVEL:
                 offset = pygame.math.Vector2(0, 4)
             fallDustParticle = PARTICLE_EFFECT(self.player.sprite.rect.midbottom - offset,'land')
             self.dustSprite.add(fallDustParticle)
-    
-    def horizontalCollisions(self):
+
+    def collisions(self):
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
         collidableSprites = self.terrainSprites.sprites() + self.crateSprites.sprites() + self.BGTreeSprites.sprites()
-        
         for sprite in collidableSprites:
             if sprite.rect.colliderect(player.rect):
                 if player.direction.x < 0:
                     player.rect.left = sprite.rect.right
                     player.onL = True
                     self.currentX = player.rect.left
-                elif player.direction.x > 0: 
+                elif player.direction.x > 0:
                     player.rect.right = sprite.rect.left
                     player.onR = True
                     self.currentX = player.rect.right
-        
-        if player.onL and (player.rect.left < self.currentX or player.direction.x >= 0):
-            player.onL = False
-        if player.onR and (player.rect.right > self.currentX or player.direction.x <= 0):
-            player.onR = False
-    
-    def verticalCollisions(self):
-        player = self.player.sprite
         player.applyGravity()
-        collidableSprites = self.terrainSprites.sprites() + self.crateSprites.sprites() + self.BGTreeSprites.sprites()
-
+        self.getPlayerOnGround()
         for sprite in collidableSprites:
             if sprite.rect.colliderect(player.rect):
-                if player.direction.y > 0: 
+                if player.direction.y > 0:
                     player.rect.bottom = sprite.rect.top
                     player.direction.y = 0
                     player.onGND = True
@@ -166,12 +143,18 @@ class LEVEL:
                     player.rect.top = sprite.rect.bottom
                     player.direction.y = 0
                     player.onCLG = True
+        self.hasTheMovedOff(player)
 
+    def hasTheMovedOff(self, player):
+        if player.onL and (player.rect.left < self.currentX or player.direction.x >= 0):
+            player.onL = False
+        if player.onR and (player.rect.right > self.currentX or player.direction.x <= 0):
+            player.onR = False
         if player.onGND and player.direction.y < 0 or player.direction.y > 1:
             player.onGND = False
         if player.onCLG and player.direction.y > 0.1:
             player.onCLG = False
-    
+
     def scrollX(self):
         player = self.player.sprite
         player_x = player.rect.centerx
@@ -218,9 +201,7 @@ class LEVEL:
         self.dustSprite.draw(self.displaySurf)
         
         self.player.update()
-        self.horizontalCollisions()
-        self.getPlayerOnGround()
-        self.verticalCollisions()
+        self.collisions()
         self.createLandDust()
         self.scrollX()
         self.player.draw(self.displaySurf)
