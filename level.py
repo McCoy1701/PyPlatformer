@@ -12,12 +12,12 @@ class LEVEL:
         self.worldShift = 0
         self.displaySurf = surf
         self.currentX = None
-        
+
         playerLayout = IMPORT_CSV(levelData['player'])
         self.player = pygame.sprite.GroupSingle()
         self.goal = pygame.sprite.GroupSingle()
         self.playerSetup(playerLayout)
-        
+
         self.dustSprite = pygame.sprite.GroupSingle()
         self.playerOnGround = False
 
@@ -64,10 +64,10 @@ class LEVEL:
                     if type == 'FGTrees':
                         if ID == '0': sprite = TREE(TILE_SIZE, x, y, 'assets/world/smallTree', 4)
                         if ID == '1': sprite = TREE(TILE_SIZE, x, y, 'assets/world/largeTree', 12)
-                    
+
                     if type == 'BGTrees':
                         sprite = TREE(TILE_SIZE, x, y, 'assets/world/bgTree', 8)
-                    
+
                     if type == 'enemies':
                         sprite = ENEMY(TILE_SIZE, x, y)
 
@@ -98,7 +98,7 @@ class LEVEL:
         if self.player.sprite.FR:
             pos -= pygame.math.Vector2(0, 4)
         else:
-            pos += pygame.math.Vector2(0, 0)
+            pos += pygame.math.Vector2(0, -4)
         jumpParticleSprite = PARTICLE_EFFECT(pos,'jump')
         self.dustSprite.add(jumpParticleSprite)
 
@@ -169,37 +169,37 @@ class LEVEL:
         else:
             self.worldShift = 0
             player.speed = 2
-    
+
     def run(self):
         self.sky.draw(self.displaySurf)
         self.clouds.draw(self.displaySurf, self.worldShift)
-         
+
         self.BGTreeSprites.update(self.worldShift)
         self.BGTreeSprites.draw(self.displaySurf)
-        
+
         self.terrainSprites.update(self.worldShift)
         self.terrainSprites.draw(self.displaySurf)
-        
+
         self.enemySprites.update(self.worldShift)
         self.constraintsSprites.update(self.worldShift)
         self.enemyCollisionReverse()
         self.enemySprites.draw(self.displaySurf)
-        
+
         self.crateSprites.update(self.worldShift)
         self.crateSprites.draw(self.displaySurf)
-        
+
         self.grassSprites.update(self.worldShift)
         self.grassSprites.draw(self.displaySurf)
-        
+
         self.coinSprites.update(self.worldShift)
         self.coinSprites.draw(self.displaySurf)
-        
+
         self.FGTreeSprites.update(self.worldShift)
         self.FGTreeSprites.draw(self.displaySurf)
 
         self.dustSprite.update(self.worldShift)
         self.dustSprite.draw(self.displaySurf)
-        
+
         self.player.update()
         self.collisions()
         self.createLandDust()
@@ -207,6 +207,5 @@ class LEVEL:
         self.player.draw(self.displaySurf)
         self.goal.update(self.worldShift)
         self.goal.draw(self.displaySurf)
-        
+
         self.water.draw(self.displaySurf, self.worldShift)
-        
