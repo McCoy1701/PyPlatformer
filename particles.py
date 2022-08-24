@@ -6,14 +6,15 @@ class PARTICLE_EFFECT(pygame.sprite.Sprite):
         super().__init__()
         self.frameIndex = 0
         self.animationSpeed = .5
-        self.checkType(type)
+        self.type = type
+        self.checkType()
         self.image = self.frames[self.frameIndex]
         self.rect = self.image.get_rect(center = pos)
     
-    def checkType(self, type):
-        if type == 'jump':
+    def checkType(self):
+        if self.type == 'jump':
             self.frames = IMPORT_FOLDER('assets/dust_particles/jump')
-        if type == 'land':
+        if self.type == 'land':
             self.frames = IMPORT_FOLDER('assets/dust_particles/land')
     
     def animate(self):

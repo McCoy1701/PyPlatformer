@@ -62,18 +62,18 @@ class LEVEL:
                         terrainTileList = IMPORT_GRAPHICS('assets/world/tilesheet.png')
                         tileSurf = terrainTileList[int(ID)]
                         sprite = STATIC_TILE(TILE_SIZE, x, y, tileSurf)
-                    
+
                     if type == 'grass':
                         grassTileList = IMPORT_GRAPHICS('assets/world/grass.png')
                         tileSurf = grassTileList[int(ID)]
                         sprite = STATIC_TILE(TILE_SIZE, x, y, tileSurf)
-                    
+
                     if type == 'crates':
                         sprite = CRATE(TILE_SIZE, x, y)
-                    
+
                     if type == 'coins':
                         sprite = COIN(TILE_SIZE, x, y, 'assets/world/coins')
-                    
+
                     if type == 'FGTrees':
                         if ID == '0': sprite = TREE(TILE_SIZE, x, y, 'assets/world/smallTree', 4)
                         if ID == '1': sprite = TREE(TILE_SIZE, x, y, 'assets/world/largeTree', 12)
@@ -86,13 +86,10 @@ class LEVEL:
 
                     if type == 'constraints':
                         sprite = TILE(TILE_SIZE, x, y)
-                    
                     spriteGroup.add(sprite)
-                        
         return spriteGroup
 
     def playerSetup(self, layout):
-        spriteGroup = pygame.sprite.Group()
         for rowIndex, row in enumerate(layout):
             for colIndex, ID in enumerate(row):
                 x = colIndex * TILE_SIZE
