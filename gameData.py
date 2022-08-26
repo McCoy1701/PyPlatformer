@@ -7,4 +7,7 @@ level0 = {
     'enemies': 'level/0/level_0_enemies.csv',
     'constraints': 'level/0/level_0_constraints.csv',
     'player': 'level/0/level_0_player.csv',
-    'grass': 'level/0/level_0_grass.csv'}
+    'grass': 'level/0/level_0_grass.csv',
+    'nodePos': (80, 60),
+    'unlock': 1,
+    'nodeGraphics': 'assets/Overworld/0'}
