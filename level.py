@@ -5,13 +5,19 @@ from enemy import ENEMY
 from decoration import SKY, WATER, CLOUD
 from player import PLAYER
 from particles import PARTICLE_EFFECT
+from gameData import levels
 from settings import *
 
 class LEVEL:
-    def __init__(self, levelData, surf):
+    def __init__(self, currentLevel, surf, createOverworld):
         self.worldShift = 0
         self.displaySurf = surf
         self.currentX = None
+
+        self.createOverworld = createOverworld
+        self.currentLevel = currentLevel
+        levelData = levels[self.currentLevel]
+        self.newMaxLevel = levelData['unlock']
 
         playerLayout = IMPORT_CSV(levelData['player'])
         self.player = pygame.sprite.GroupSingle()
@@ -170,6 +176,14 @@ class LEVEL:
             self.worldShift = 0
             player.speed = 2
 
+    def checkDeath(self):
+        if self.player.sprite.rect.top > ASCREEN_HEIGHT:
+            self.createOverworld(self.currentLevel, 0)
+
+    def checkWin(self):
+        if pygame.sprite.spritecollide(self.player.sprite, self.goal, False):
+            self.createOverworld(self.currentLevel, self.newMaxLevel)
+
     def run(self):
         self.sky.draw(self.displaySurf)
         self.clouds.draw(self.displaySurf, self.worldShift)
@@ -207,5 +221,7 @@ class LEVEL:
         self.player.draw(self.displaySurf)
         self.goal.update(self.worldShift)
         self.goal.draw(self.displaySurf)
+        self.checkDeath()
+        self.checkWin()
 
         self.water.draw(self.displaySurf, self.worldShift)
